@@ -46,7 +46,7 @@ class Authentication {
 
 
     http.Response response = await http.post(ApiUtl.AUTH_LOGIN,headers: headers, body: body);
-    print('done');
+    
     print(response.statusCode);
 
     if (response.statusCode == 200) {
