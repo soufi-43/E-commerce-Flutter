@@ -46,13 +46,15 @@ class Authentication {
 
 
     http.Response response = await http.post(ApiUtl.AUTH_LOGIN,headers: headers, body: body);
-    
+
     print(response.statusCode);
 
     if (response.statusCode == 200) {
       var body = jsonDecode(response.body);
       var data = body['data'];
       print(data);
+
+      print(response.statusCode);
 
       return User.fromJson(data);
 
