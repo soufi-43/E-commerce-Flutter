@@ -1,3 +1,6 @@
+import 'package:connectivity/connectivity.dart';
+import 'package:generalshop1/exceptions/exceptions.dart';
+
 class ApiUtl{
 
 
@@ -9,9 +12,37 @@ class ApiUtl{
   static const String PRODUCT = MAIN_API_URL + "products/";
 
 
+  static const String CATEGORIES = MAIN_API_URL + "categories";
+
+  static const String COUNTRIES = MAIN_API_URL + "countries";
+  static const String TAGS = MAIN_API_URL + "tags";
+
+
+  static String CITIES(int id){
+    return MAIN_API_URL+'countries/'+id.toString() +'/cities';
+  }
+
+  static String STATES(int id){
+    return COUNTRIES+'/'+id.toString()+'/states';
+  }
+
+
+
+}
+Future<void> checkInternet()async{
+  var connectivityResult = await (Connectivity().checkConnectivity());
+  if (connectivityResult != ConnectivityResult.mobile && connectivityResult != ConnectivityResult.mobile) {
+    throw NoInternetConnection();
+  }
+
+
+
+
+
 
 
 
 
 }
+
 

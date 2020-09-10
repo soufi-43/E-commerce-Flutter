@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:generalshop1/api/authentication.dart';
 import 'package:generalshop1/product/Product.dart';
+import 'api/helpers_api.dart';
 
 import 'api/products_api.dart';
 
@@ -25,8 +27,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  ProductApi productApi = ProductApi();
-
+    HelpersApi helpersApi = HelpersApi();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,10 +37,10 @@ class _HomePageState extends State<HomePage> {
       body: Container(
           child: Center(
             child: FutureBuilder(
-              future: productApi.fetchProduct(75),
+              future: helpersApi.fetchState(1,1),
               builder:
                   (BuildContext context,
-                  AsyncSnapshot<Product> snapShot) {
+                  AsyncSnapshot snapShot) {
                 switch (snapShot.connectionState) {
                   case ConnectionState.none:
                     return _error('nothing happened:');
@@ -57,7 +58,9 @@ class _HomePageState extends State<HomePage> {
                       if (!snapShot.hasData) {
                         return _error('no data');
                       } else {
-                       return _drawProduct(snapShot.data);
+                       return ListView.builder(itemBuilder: (BuildContext context,int position){
+                         return _drawCard(snapShot.data[position]);
+                       },itemCount: snapShot.data.length,);
                       }
                     }
 
@@ -103,5 +106,14 @@ class _HomePageState extends State<HomePage> {
 
       ),
     );
+  }
+
+  Widget _drawCard(dynamic item){
+    return Card(
+      child: Padding(padding:EdgeInsets.all(16),
+      child: Text(item.state_name),),
+
+    );
+
   }
 }
