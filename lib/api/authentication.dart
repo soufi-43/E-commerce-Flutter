@@ -18,6 +18,8 @@ class Authentication {
   Future<User> register(String first_name, String last_name, String email,
       String password) async {
 
+    await checkInternet();
+
     Map<String, String> body = {
       'email': email,
       'first_name': first_name,
@@ -51,6 +53,7 @@ class Authentication {
   }
 
   Future<User> login(String email, String password) async {
+    await checkInternet();
     Map<String, String> headers = {
       'Accept': 'application/json',
     };
