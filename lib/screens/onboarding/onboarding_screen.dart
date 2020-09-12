@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:generalshop1/screens/onboarding/onboarding_model.dart';
+import 'package:generalshop1/screens/utilities/size_config.dart';
 
 class SingleOnBoarding extends StatelessWidget {
 
@@ -8,9 +9,13 @@ class SingleOnBoarding extends StatelessWidget {
 
 
   SingleOnBoarding(this.onBoardingModel);
+  ScreenConfig screenConfig ;
+  WidgetSize widgetSize ;
 
   @override
   Widget build(BuildContext context) {
+    screenConfig = ScreenConfig(context);
+    widgetSize =WidgetSize(screenConfig);
     return Column(
       children: <Widget>[
         SizedBox(
@@ -23,7 +28,7 @@ class SingleOnBoarding extends StatelessWidget {
         Text(
           onBoardingModel.title,
           style: TextStyle(
-            //fontSize: widgetSize.titleFontSize,
+            fontSize: widgetSize.titleFontSize,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -37,7 +42,7 @@ class SingleOnBoarding extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               height: 1.5,
-              //fontSize: widgetSize.descriptionFontSize,
+              fontSize: widgetSize.descriptionFontSize,
               fontWeight: FontWeight.w400,
               color: Colors.blueGrey,
             ),

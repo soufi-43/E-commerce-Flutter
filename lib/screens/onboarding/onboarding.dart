@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:generalshop1/screens/onboarding/onboarding_model.dart';
 import 'package:generalshop1/screens/onboarding/onboarding_screen.dart';
 import 'package:generalshop1/screens/utilities/screen_utilities.dart';
+import 'package:generalshop1/screens/utilities/size_config.dart';
 
 class OnBoarding extends StatefulWidget {
   @override
@@ -17,6 +18,9 @@ class _OnBoardingState extends State<OnBoarding> {
 
   int currentIndex = 0;
   bool lastPage = false ;
+
+  ScreenConfig screenConfig ;
+  WidgetSize widgetSize ;
 
   List<OnBoardingModel> screens = [
     OnBoardingModel(
@@ -55,6 +59,8 @@ class _OnBoardingState extends State<OnBoarding> {
 
   @override
   Widget build(BuildContext context) {
+    screenConfig = ScreenConfig(context);
+    widgetSize = WidgetSize(screenConfig);
     double _mt = MediaQuery.of(context).size.height * 0.2;
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
@@ -113,8 +119,8 @@ class _OnBoardingState extends State<OnBoarding> {
                 ? ScreenUtilities.mainBlue
                 : ScreenUtilities.LightGrey,
           ),
-          width: 35,
-          height: 6,
+          width: widgetSize.pagerDotsWidth,
+          height: widgetSize.pagerDotsHeight,
           margin: (i == qty - 1)
               ? EdgeInsets.only(right: 0)
               : EdgeInsets.only(right: 24),
@@ -124,14 +130,16 @@ class _OnBoardingState extends State<OnBoarding> {
     return widgets;
   }
   Widget _showButton() {
+    double offset = (screenConfig.screenType==ScreenType.SMALL)?0.05:0.1;
     return Container(
       child: Transform.translate(
-        offset: Offset(0, -(screenHeight * 0.1)),
+
+        offset: Offset(0, -(screenHeight * offset)),
         child: Container(
           color: Colors.white,
           child: SizedBox(
             width: screenWidth * 0.75,
-            height:60,
+            height:widgetSize.buttonHeight,
             child: RaisedButton(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(34)),
@@ -144,7 +152,7 @@ class _OnBoardingState extends State<OnBoarding> {
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 15,
+                  fontSize: widgetSize.buttonFontSize,
                   letterSpacing: 2,
                 ),
               ),
