@@ -20,11 +20,11 @@ class HelpersApi {
   Map<String, String> headers = {'Accept': 'application/json'};
 
 
-  Future<List<ProductCategory>>fetchCategories(int page)async{
+  Future<List<ProductCategory>>fetchCategories()async{
     await checkInternet();
+    String url = ApiUtl.CATEGORIES ;
+    print(url);
 
-
-    String url = ApiUtl.CATEGORIES + '?page='+page.toString();
     http.Response response =await http.get(url,headers: headers);
     print(url);
 

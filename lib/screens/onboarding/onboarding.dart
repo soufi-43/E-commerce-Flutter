@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:generalshop1/screens/home_page.dart';
 import 'package:generalshop1/screens/onboarding/onboarding_model.dart';
 import 'package:generalshop1/screens/onboarding/onboarding_screen.dart';
 import 'package:generalshop1/screens/utilities/screen_utilities.dart';
 import 'package:generalshop1/screens/utilities/size_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnBoarding extends StatefulWidget {
   @override
@@ -17,10 +19,11 @@ class _OnBoardingState extends State<OnBoarding> {
   double screenWidth;
 
   int currentIndex = 0;
-  bool lastPage = false ;
+  bool lastPage = false;
 
-  ScreenConfig screenConfig ;
-  WidgetSize widgetSize ;
+  ScreenConfig screenConfig;
+
+  WidgetSize widgetSize;
 
   List<OnBoardingModel> screens = [
     OnBoardingModel(
@@ -83,10 +86,10 @@ class _OnBoardingState extends State<OnBoarding> {
                 onPageChanged: (int index) {
                   setState(() {
                     currentIndex = index;
-                    if(index==(screens.length-1)){
-                      lastPage=true ;
-                    }else{
-                      lastPage=false;
+                    if (index == (screens.length - 1)) {
+                      lastPage = true;
+                    } else {
+                      lastPage = false;
                     }
                   });
                 },
@@ -102,7 +105,7 @@ class _OnBoardingState extends State<OnBoarding> {
               ),
             ),
           ),
-          (lastPage )? _showButton() : Container(),
+          (lastPage) ? _showButton() : Container(),
         ],
       ),
     );
@@ -129,23 +132,27 @@ class _OnBoardingState extends State<OnBoarding> {
     }
     return widgets;
   }
+
   Widget _showButton() {
-    double offset = (screenConfig.screenType==ScreenType.SMALL)?0.05:0.1;
+    double offset = (screenConfig.screenType == ScreenType.SMALL) ? 0.05 : 0.1;
     return Container(
       child: Transform.translate(
-
         offset: Offset(0, -(screenHeight * offset)),
         child: Container(
           color: Colors.white,
           child: SizedBox(
             width: screenWidth * 0.75,
-            height:widgetSize.buttonHeight,
+            height: widgetSize.buttonHeight,
             child: RaisedButton(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(34)),
               color: ScreenUtilities.mainBlue,
               onPressed: () async {
-
+                WidgetsFlutterBinding.ensureInitialized();
+                var pref = await SharedPreferences.getInstance();
+                pref.setBool('is_seen', true);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HomePage()));
               },
               child: Text(
                 'START',
