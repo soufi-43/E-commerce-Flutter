@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:generalshop1/api/helpers_api.dart';
+import 'package:generalshop1/product/Product.dart';
+import 'package:generalshop1/product/home_products.dart';
 import 'package:generalshop1/product/product_category.dart';
 import 'package:generalshop1/screens/utilities/helpers_widgets.dart';
 import 'package:generalshop1/screens/utilities/screen_utilities.dart';
@@ -10,18 +12,18 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with TickerProviderStateMixin {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   HelpersApi helpersApi = HelpersApi();
+  HomeProductBloc homeProductBloc = HomeProductBloc();
+  List<ProductCategory> productsCategories;
 
   ScreenConfig screenConfig;
   TabController tabController;
+  int currentIndex = 0;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
   }
 
   @override
@@ -29,6 +31,7 @@ class _HomePageState extends State<HomePage>
     // TODO: implement dispose
     super.dispose();
     tabController.dispose();
+    homeProductBloc.dispose();
   }
 
   @override
@@ -54,7 +57,9 @@ class _HomePageState extends State<HomePage>
                 if (!snapshot.hasData) {
                   return error('no data found');
                 } else {
-
+                  this.productsCategories = snapshot.data;
+                  homeProductBloc.fetchProducts
+                      .add(this.productsCategories[0].category_id);
                   return _screen(snapshot.data);
                 }
               }
@@ -66,7 +71,7 @@ class _HomePageState extends State<HomePage>
 
   Widget _screen(List<ProductCategory> categories) {
     tabController = TabController(
-      initialIndex: 0,
+      initialIndex: currentIndex,
       vsync: this,
       length: categories.length,
     );
@@ -84,24 +89,79 @@ class _HomePageState extends State<HomePage>
         ],
         bottom: TabBar(
           indicatorColor: ScreenUtilities.mainBlue,
-            controller: tabController,
-            isScrollable: true,
-            tabs: _tabs(categories)),
+          controller: tabController,
+          isScrollable: true,
+          tabs: _tabs(categories),
+          onTap: (int index) {
+            homeProductBloc.fetchProducts.add(this.productsCategories[index].category_id);
+          },
+        ),
       ),
-      body: Container(),
+      body: Container(
+        child: StreamBuilder(
+            stream: homeProductBloc.productsStream,
+            builder:
+            (BuildContext context, AsyncSnapshot snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return error('nothing is working');
+              break;
+            case ConnectionState.waiting:
+              return loading();
+              break;
+
+            case ConnectionState.done:
+            case ConnectionState.active:
+
+              if (snapshot.hasError) {
+                return error(snapshot.error.toString());
+              } else {
+                if (!snapshot.hasData) {
+                  return error('no data found');
+                } else {
+                  return _drawProducts(snapshot.data);
+                }
+              }
+              break;
+          }
+          return Container();
+        }),
+      ),
     );
   }
 }
 
-List<Tab> _tabs(List<ProductCategory> categories) {
+Widget _drawProducts(List<Product> products) {
+  return Container(
+    child: Column(
+      children: <Widget>[
+        Flexible(
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+              itemCount: products.length,
+              itemBuilder: (context, position) {
+                return Card(
+                  child: Container(
 
+                    child: Image(
+                      image: NetworkImage(products[position].featuredImage()),
+                    ),
+                  ),
+                );
+              }),
+        ),
+      ],
+    ),
+  );
+}
+
+List<Tab> _tabs(List<ProductCategory> categories) {
   List<Tab> tabs = [];
 
-  for(ProductCategory category in categories){
+  for (ProductCategory category in categories) {
     tabs.add(Tab(
-      text : category.category_name ,
+      text: category.category_name,
     ));
   }
-  return tabs ;
-
+  return tabs;
 }

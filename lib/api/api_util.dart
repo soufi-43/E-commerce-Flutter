@@ -12,6 +12,11 @@ class ApiUtl{
   static const String PRODUCT = MAIN_API_URL + "products/";
 
 
+  static String CATEGORY_PRODUCTS(int id,int page) {
+    return MAIN_API_URL + 'categories/'+id.toString()+'/products?page'+page.toString();
+  }
+
+
   static const String CATEGORIES = MAIN_API_URL + "categories";
 
   static const String COUNTRIES = MAIN_API_URL + "countries";
