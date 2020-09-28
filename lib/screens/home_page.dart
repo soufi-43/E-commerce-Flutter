@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:generalshop1/api/helpers_api.dart';
 import 'package:generalshop1/product/Product.dart';
@@ -20,10 +22,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   ScreenConfig screenConfig;
   TabController tabController;
   int currentIndex = 0;
+  PageController _pageController;
+  int dotsCurrentIndex ;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(
+      initialPage: 1,
+      viewportFraction: 0.75
+    );
   }
 
   @override
@@ -60,7 +68,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   this.productsCategories = snapshot.data;
                   homeProductBloc.fetchProducts
                       .add(this.productsCategories[0].category_id);
-                  return _screen(snapshot.data);
+                  return _screen(snapshot.data, context);
                 }
               }
               break;
@@ -69,7 +77,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         });
   }
 
-  Widget _screen(List<ProductCategory> categories) {
+  Widget _screen(List<ProductCategory> categories, BuildContext context) {
     tabController = TabController(
       initialIndex: currentIndex,
       vsync: this,
@@ -93,67 +101,212 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           isScrollable: true,
           tabs: _tabs(categories),
           onTap: (int index) {
-            homeProductBloc.fetchProducts.add(this.productsCategories[index].category_id);
+            homeProductBloc.fetchProducts
+                .add(this.productsCategories[index].category_id);
           },
         ),
       ),
       body: Container(
         child: StreamBuilder(
             stream: homeProductBloc.productsStream,
-            builder:
-            (BuildContext context, AsyncSnapshot snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return error('nothing is working');
-              break;
-            case ConnectionState.waiting:
-              return loading();
-              break;
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  return error('nothing is working');
+                  break;
+                case ConnectionState.waiting:
+                  return loading();
+                  break;
 
-            case ConnectionState.done:
-            case ConnectionState.active:
-
-              if (snapshot.hasError) {
-                return error(snapshot.error.toString());
-              } else {
-                if (!snapshot.hasData) {
-                  return error('no data found');
-                } else {
-                  return _drawProducts(snapshot.data);
-                }
+                case ConnectionState.done:
+                case ConnectionState.active:
+                  if (snapshot.hasError) {
+                    return error(snapshot.error.toString());
+                  } else {
+                    if (!snapshot.hasData) {
+                      return error('no data found');
+                    } else {
+                      return _drawProducts(snapshot.data, context);
+                    }
+                  }
+                  break;
               }
-              break;
-          }
-          return Container();
-        }),
+              return Container();
+            }),
       ),
     );
   }
-}
+//  Widget _drawProducts(List<Product> products, BuildContext context) {
+//    List<Product> topProducts = _randomTopProducts(products);
+//    return Container(
+//      child: Column(
+//        children: <Widget>[
+//          Flexible(
+//            child: SizedBox(
+//              height: MediaQuery.of(context).size.height * 0.25,
+//              child: PageView.builder(
+//                  controller: _pageController,
+//                  scrollDirection: Axis.horizontal,
+//                  itemCount: topProducts.length,
+//                  itemBuilder: (context, position) {
+//                    return Card(
+//                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+//                      margin: EdgeInsets.only(left: 4, right: 4),
+//                      clipBehavior: Clip.hardEdge,
+//                      child: Container(
+//                        child: Image(
+//                          fit: BoxFit.cover,
+//                          image:
+//                          NetworkImage(topProducts[position].featuredImage()),
+//                        ),
+//                      ),
+//                    );
+//                  }),
+//            ),
+//          ),
+//          Container(
+//            child:  _pageViewDots(),
+//          ),
+//        ],
+//      ),
+//    );
+//  }
 
-Widget _drawProducts(List<Product> products) {
-  return Container(
-    child: Column(
-      children: <Widget>[
-        Flexible(
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-              itemCount: products.length,
-              itemBuilder: (context, position) {
-                return Card(
-                  child: Container(
+  Widget _drawProducts(List<Product> products, BuildContext context) {
+    List<Product> topProducts = _randomTopProducts(products);
+    return Container(
+      padding: EdgeInsets.only(top: 24),
+      child: Column(
+        children: <Widget>[
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.25,
+            child: PageView.builder(
+                controller: _pageController,
+                scrollDirection: Axis.horizontal,
+                itemCount: topProducts.length,
+                onPageChanged: (int index) {
 
-                    child: Image(
-                      image: NetworkImage(products[position].featuredImage()),
+                },
+                itemBuilder: (context, position) {
+                  return InkWell(
+                    onTap: () {
+
+                    },
+                    child: Card(
+                      margin: EdgeInsets.only(left: 4, right: 4),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      clipBehavior: Clip.hardEdge,
+                      child: Container(
+                        child: Image(
+                          loadingBuilder: (context,image,ImageChunkEvent loadingProgress){
+                            if(loadingProgress==null){
+                              return image ;
+
+                            }
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+
+                          },
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                              topProducts[position].featuredImage()),
+                        ),
+                      ),
                     ),
+                  );
+                }),
+          ),
+
+          Flexible(
+            child: Padding(
+              padding: EdgeInsets.only(right: 8, left: 8, top: 24),
+              child: GridView.builder(
+                  itemCount: products.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 0.6,
                   ),
-                );
-              }),
-        ),
-      ],
-    ),
-  );
+                  itemBuilder: (context, position) {
+                    return InkWell(
+                      onTap: () {
+
+                      },
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 130,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  shape: BoxShape.rectangle),
+                              child: Image(
+                                loadingBuilder: (context,image,ImageChunkEvent loadingProgress){
+                                  if(loadingProgress==null){
+                                    return image ;
+
+                                  }
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+
+                                },
+                                image: NetworkImage(
+                                  products[position].featuredImage(),
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 2),
+                            child: Text(
+                              products[position].product_title,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.subhead,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: Text(
+                              '\$ ${products[position].product_price.toString()}',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.subhead,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+List<Product> _randomTopProducts(List<Product> products) {
+  Random random = Random();
+  List<int> indexes = [];
+  int counter = 5;
+  List<Product> newProducts = [];
+  do {
+    int rnd = random.nextInt(products.length);
+    if (!indexes.contains(rnd)) {
+      indexes.add(rnd);
+      counter--;
+    }
+  } while (counter != 0);
+  for (int index in indexes) {
+    newProducts.add(products[index]);
+  }
+  return newProducts;
 }
+
 
 List<Tab> _tabs(List<ProductCategory> categories) {
   List<Tab> tabs = [];
@@ -164,4 +317,6 @@ List<Tab> _tabs(List<ProductCategory> categories) {
     ));
   }
   return tabs;
+}
+
 }
