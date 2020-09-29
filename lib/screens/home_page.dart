@@ -1,10 +1,12 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:generalshop1/api/helpers_api.dart';
 import 'package:generalshop1/product/Product.dart';
 import 'package:generalshop1/product/home_products.dart';
 import 'package:generalshop1/product/product_category.dart';
+import 'package:generalshop1/screens/single_product.dart';
 import 'package:generalshop1/screens/utilities/helpers_widgets.dart';
 import 'package:generalshop1/screens/utilities/screen_utilities.dart';
 import 'package:generalshop1/screens/utilities/size_config.dart';
@@ -23,15 +25,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   TabController tabController;
   int currentIndex = 0;
   PageController _pageController;
-  int dotsCurrentIndex ;
+  int dotsCurrentIndex;
+
+  ValueNotifier<int> dotsIndex = ValueNotifier(1);
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(
-      initialPage: 1,
-      viewportFraction: 0.75
-    );
+    _pageController = PageController(initialPage: 1, viewportFraction: 0.75);
   }
 
   @override
@@ -136,6 +137,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     );
   }
+
 //  Widget _drawProducts(List<Product> products, BuildContext context) {
 //    List<Product> topProducts = _randomTopProducts(products);
 //    return Container(
@@ -185,11 +187,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 scrollDirection: Axis.horizontal,
                 itemCount: topProducts.length,
                 onPageChanged: (int index) {
-
+                  dotsIndex.value = index ;
                 },
                 itemBuilder: (context, position) {
                   return InkWell(
                     onTap: () {
+                      _gotoSingleProduct(topProducts[position], context);
 
                     },
                     child: Card(
@@ -199,15 +202,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       clipBehavior: Clip.hardEdge,
                       child: Container(
                         child: Image(
-                          loadingBuilder: (context,image,ImageChunkEvent loadingProgress){
-                            if(loadingProgress==null){
-                              return image ;
-
+                          loadingBuilder: (context, image,
+                              ImageChunkEvent loadingProgress) {
+                            if (loadingProgress == null) {
+                              return image;
                             }
                             return Center(
                               child: CircularProgressIndicator(),
                             );
-
                           },
                           fit: BoxFit.cover,
                           image: NetworkImage(
@@ -218,7 +220,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   );
                 }),
           ),
-
+          ValueListenableBuilder(
+            valueListenable: dotsIndex,
+            builder: (context,value,_){
+              return Container(
+                padding: EdgeInsets.only(top: 16,),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: _drawDots(topProducts.length,value),
+                ),
+              );
+            },
+          ),
           Flexible(
             child: Padding(
               padding: EdgeInsets.only(right: 8, left: 8, top: 24),
@@ -233,7 +246,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   itemBuilder: (context, position) {
                     return InkWell(
                       onTap: () {
-
+                        _gotoSingleProduct(topProducts[position], context);
                       },
                       child: Column(
                         children: <Widget>[
@@ -244,15 +257,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   borderRadius: BorderRadius.circular(15),
                                   shape: BoxShape.rectangle),
                               child: Image(
-                                loadingBuilder: (context,image,ImageChunkEvent loadingProgress){
-                                  if(loadingProgress==null){
-                                    return image ;
-
+                                loadingBuilder: (context, image,
+                                    ImageChunkEvent loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return image;
                                   }
                                   return Center(
                                     child: CircularProgressIndicator(),
                                   );
-
                                 },
                                 image: NetworkImage(
                                   products[position].featuredImage(),
@@ -288,35 +300,64 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-
-List<Product> _randomTopProducts(List<Product> products) {
-  Random random = Random();
-  List<int> indexes = [];
-  int counter = 5;
-  List<Product> newProducts = [];
-  do {
-    int rnd = random.nextInt(products.length);
-    if (!indexes.contains(rnd)) {
-      indexes.add(rnd);
-      counter--;
+  List<Widget> _drawDots(int qty, int index) {
+    List<Widget> widgets = [];
+    for (int i = 0; i < qty; i++) {
+      widgets.add(
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            color: (i == index)
+                ? ScreenUtilities.mainBlue
+                : ScreenUtilities.LightGrey,
+          ),
+          width: 10,
+          height: 10,
+          margin: (i == qty - 1)
+              ? EdgeInsets.only(right: 0)
+              : EdgeInsets.only(right: 10),
+        ),
+      );
     }
-  } while (counter != 0);
-  for (int index in indexes) {
-    newProducts.add(products[index]);
+    return widgets;
   }
-  return newProducts;
+
+  List<Product> _randomTopProducts(List<Product> products) {
+    Random random = Random();
+    List<int> indexes = [];
+    int counter = 5;
+    List<Product> newProducts = [];
+    do {
+      int rnd = random.nextInt(products.length);
+      if (!indexes.contains(rnd)) {
+        indexes.add(rnd);
+        counter--;
+      }
+    } while (counter != 0);
+    for (int index in indexes) {
+      newProducts.add(products[index]);
+    }
+    return newProducts;
+  }
+
+  List<Tab> _tabs(List<ProductCategory> categories) {
+    List<Tab> tabs = [];
+
+    for (ProductCategory category in categories) {
+      tabs.add(Tab(
+        text: category.category_name,
+      ));
+    }
+    return tabs;
+  }
 }
 
+void _gotoSingleProduct(Product product,BuildContext context){
+  Navigator.push(context, MaterialPageRoute(
+    builder: (context){
 
-List<Tab> _tabs(List<ProductCategory> categories) {
-  List<Tab> tabs = [];
-
-  for (ProductCategory category in categories) {
-    tabs.add(Tab(
-      text: category.category_name,
-    ));
-  }
-  return tabs;
-}
+      return SingleProduct(product) ;
+    }
+  ));
 
 }

@@ -52,6 +52,7 @@ class Generalshop1 extends StatelessWidget {
               fontFamily: "Quicksand",
               fontWeight: FontWeight.w700,
               fontSize: 8,
+
             ),
             title: TextStyle(
               height: 2,
@@ -59,6 +60,29 @@ class Generalshop1 extends StatelessWidget {
               fontFamily: "Quicksand",
               fontWeight: FontWeight.w700,
               fontSize: 22,
+            ),
+            display1: TextStyle(
+              color: ScreenUtilities.darkerGreyText,
+              fontFamily: "Quicksand",
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+            display2: TextStyle(
+              color: ScreenUtilities.darkerGreyText,
+              fontFamily: "Quicksand",
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              height: 1.75,
+              letterSpacing: 0.5,
+            ),
+            display3: TextStyle(
+
+              fontFamily: "Nunito",
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              height: 1.75,
+              letterSpacing: 0.5,
+              color: ScreenUtilities.textColor,
             ),
           ),
         ),
@@ -78,6 +102,9 @@ class Generalshop1 extends StatelessWidget {
             fontWeight: FontWeight.w700,
             fontFamily: "Quicksand",
           ),
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: ScreenUtilities.mainBlue,
         ),
       ),
     );
