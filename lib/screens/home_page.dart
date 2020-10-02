@@ -206,6 +206,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ImageChunkEvent loadingProgress) {
                             if (loadingProgress == null) {
                               return image;
+
+
+
                             }
                             return Center(
                               child: CircularProgressIndicator(),

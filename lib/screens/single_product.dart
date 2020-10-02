@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:generalshop1/product/Product.dart';
+import 'package:generalshop1/screens/login.dart';
 import 'package:generalshop1/screens/utilities/screen_utilities.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SingleProduct extends StatefulWidget {
   final Product product ;
@@ -24,6 +26,16 @@ class _SingleProductState extends State<SingleProduct> {
       body: _drawScreen(context),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add_shopping_cart),
+        onPressed: ()async{
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            int userId = pref.getInt('user_id');
+            if(userId==null){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
+
+            }else{
+              print(userId);
+            }
+        },
 
       ),
     );

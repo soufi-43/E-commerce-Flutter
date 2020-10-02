@@ -7,6 +7,7 @@ import 'package:generalshop1/exceptions/exceptions.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class Authentication {
@@ -70,20 +71,25 @@ class Authentication {
     print(response.statusCode);
 
     switch(response.statusCode){
-      case 201 :
+      case 200 :
 
           var body = jsonDecode(response.body);
           var data = body['data'];
+          User user = User.fromJson(data);
+          await _saveUser(user.user_id);
 
           print(response.statusCode);
 
-          return User.fromJson(data);
+          return user ;
           break ;
       case 404 :
         throw ResourceNotFound('User');
         break ;
       case 401 :
         throw LoginFailed();
+        break ;
+      case 422 :
+        throw UnprocessedEntity();
         break ;
       default :
         return null ;
@@ -92,6 +98,12 @@ class Authentication {
     }
 
     }
+
+  Future<void> _saveUser(int userID) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setInt('user_id', userID);
+    //sharedPreferences.setString('api_token', apiToken);
+  }
 
 
 
