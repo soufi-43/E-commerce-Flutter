@@ -9,16 +9,13 @@ import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class Authentication {
   Map<String, String> headers = {
     'Accept': 'application/json',
   };
 
-
   Future<User> register(String first_name, String last_name, String email,
       String password) async {
-
     await checkInternet();
 
     Map<String, String> body = {
@@ -31,26 +28,22 @@ class Authentication {
     http.Response response =
         await http.post(ApiUtl.AUTH_REGISTER, headers: headers, body: body);
 
-    switch(response.statusCode){
-      case 201 :
-
+    switch (response.statusCode) {
+      case 201:
         var body = jsonDecode(response.body);
         var data = body['data'];
 
         print(response.statusCode);
 
         return User.fromJson(data);
-        break ;
-      case 422 :
+        break;
+      case 422:
         throw UnprocessedEntity();
-        break ;
-      default :
-        return null ;
-        break ;
-
+        break;
+      default:
+        return null;
+        break;
     }
-
-
   }
 
   Future<User> login(String email, String password) async {
@@ -64,58 +57,40 @@ class Authentication {
     };
     print('readddyyyy');
 
-
-
-    http.Response response = await http.post(ApiUtl.AUTH_LOGIN,headers: headers, body: body);
+    http.Response response =
+        await http.post(ApiUtl.AUTH_LOGIN, headers: headers, body: body);
 
     print(response.statusCode);
 
-    switch(response.statusCode){
-      case 200 :
+    switch (response.statusCode) {
+      case 200:
+        var body = jsonDecode(response.body);
+        var data = body['data'];
+        User user = User.fromJson(data);
+        await _saveUser(user.user_id, user.api_token);
 
-          var body = jsonDecode(response.body);
-          var data = body['data'];
-          User user = User.fromJson(data);
-          await _saveUser(user.user_id);
+        print(response.statusCode);
 
-          print(response.statusCode);
-
-          return user ;
-          break ;
-      case 404 :
+        return user;
+        break;
+      case 404:
         throw ResourceNotFound('User');
-        break ;
-      case 401 :
+        break;
+      case 401:
         throw LoginFailed();
-        break ;
-      case 422 :
+        break;
+      case 422:
         throw UnprocessedEntity();
-        break ;
-      default :
-        return null ;
-        break ;
-
+        break;
+      default:
+        return null;
+        break;
     }
+  }
 
-    }
-
-  Future<void> _saveUser(int userID) async {
+  Future<void> _saveUser(int userID, String apiToken) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setInt('user_id', userID);
-    //sharedPreferences.setString('api_token', apiToken);
+    sharedPreferences.setString('api_token', apiToken);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-  }
-
+}

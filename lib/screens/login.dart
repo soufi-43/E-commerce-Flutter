@@ -175,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
             context, MaterialPageRoute(builder: (context) => HomePage()));
       } else {
         setState(() {
-          _loading = false;
+          _loading = true;
           print('kjkjhkjhkj');
         });
       }

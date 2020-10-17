@@ -69,6 +69,8 @@ class Product {
     this.images = [];
     if (jsonObject['product_images'] != null) {
       _setImages(jsonObject['product_images']);
+    }else{
+      print('jhj');
     }
 
     this.reviews = [];

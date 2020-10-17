@@ -11,6 +11,8 @@ import 'package:generalshop1/screens/utilities/helpers_widgets.dart';
 import 'package:generalshop1/screens/utilities/screen_utilities.dart';
 import 'package:generalshop1/screens/utilities/size_config.dart';
 
+import 'cart_screen.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -85,6 +87,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       length: categories.length,
     );
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('My Name'),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200 ,
+              ),
+            ),
+            ListTile(
+              title: Text('Cart'),
+              leading: Icon(Icons.card_travel),
+              trailing: Icon(Icons.arrow_forward_ios),
+              onTap: (){
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>CartScreen()));
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         centerTitle: true,
         title: Text(

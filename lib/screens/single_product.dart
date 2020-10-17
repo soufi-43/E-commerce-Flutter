@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:generalshop1/api/cart_api.dart';
 import 'package:generalshop1/product/Product.dart';
 import 'package:generalshop1/screens/login.dart';
 import 'package:generalshop1/screens/utilities/screen_utilities.dart';
@@ -17,6 +18,10 @@ class SingleProduct extends StatefulWidget {
 }
 
 class _SingleProductState extends State<SingleProduct> {
+  bool _addingToCart = false ;
+
+
+  CartApi cartApi = CartApi();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,21 +30,30 @@ class _SingleProductState extends State<SingleProduct> {
       ),
       body: _drawScreen(context),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add_shopping_cart),
+        child:(_addingToCart)?CircularProgressIndicator():Icon(Icons.add_shopping_cart),
         onPressed: ()async{
             SharedPreferences pref = await SharedPreferences.getInstance();
             int userId = pref.getInt('user_id');
+            print('gggggggggggggggggggggggggggggggggggggggg'+userId.toString());
             if(userId==null){
               Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
 
             }else{
-              print(userId);
+             setState(() {
+               _addingToCart = true ;
+             });
+             await cartApi.addProductToCart(widget.product.product_id);
+             setState(() {
+               _addingToCart = false;
+             });
             }
         },
 
       ),
     );
   }
+
+
 
 
   Widget _drawScreen(BuildContext context) {
