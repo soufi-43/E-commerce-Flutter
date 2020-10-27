@@ -12,7 +12,7 @@ class CartItem {
 
   CartItem.fromJson(Map<String, dynamic> jsonObject) {
    this.product = Product.fromJson(jsonObject['product']);
-   print(this.product);
+   //print(this.product);
 
     this.qty = double.tryParse(jsonObject['qty']);
   }
@@ -30,20 +30,12 @@ class Cart {
   Cart.fromJson(Map<String, dynamic> jsonObject) {
     cartItems = [];
     var items = jsonObject['cart_items'];
-    print(items);
+    //print(items);
     for (var item in items) {
       //cartItems.add(CartItem.fromJson(item));
-
-
-
     cartItems.add(CartItem.fromJson(item));
-
-
-
       //print(item['product']);
       //print('=============================================================/n ==============================');
-
-
     }
     this.id = jsonObject['id'];
     this.total = jsonObject['total'];

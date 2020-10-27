@@ -25,7 +25,7 @@ class _CartScreenState extends State<CartScreen> {
       appBar: AppBar(
         title: Text('Cart'),
       ),
-      body: (isLoading)? _showLoading : FutureBuilder(
+      body: (isLoading)? _showLoading(): FutureBuilder(
         future: cartApi.fetchCart(),
         builder: (BuildContext context, AsyncSnapshot<Cart> snapshot) {
           switch (snapshot.connectionState) {
@@ -45,10 +45,7 @@ class _CartScreenState extends State<CartScreen> {
                   return ListView.builder(
                     itemCount: snapshot.data.cartItems.length,
                     itemBuilder: (BuildContext context, int position) {
-                      return ListTile(
-                        title: Text(snapshot.data.cartItems[position].product.product_title),
-                        trailing:Text(snapshot.data.cartItems[position].qty.toString()) ,
-                      );
+                      return _drawProductRow(snapshot.data.cartItems[position]);
                     },
                   );
                 } else {
@@ -67,6 +64,12 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+//  Widget _drawProductRow(CartItem cartItem){
+//
+//  }
+//
+
+
 
   Widget _showLoading(){
     return Container(
@@ -76,59 +79,59 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-//  Widget _drawProductRow(CartItem cartItem) {
-//    return Padding(
-//      padding: const EdgeInsets.all(16.0),
-//      child: Row(
-//        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//        children: <Widget>[
-//          Flexible(
-//            child: Column(
-//              crossAxisAlignment: CrossAxisAlignment.start,
-//              children: <Widget>[
-//                Container(
-//                  width: 100,
-//                  height: 100,
-//                  decoration: BoxDecoration(
-//                    image: DecorationImage(
-//                      image: NetworkImage(cartItem.product.featuredImage()),
-//                    ),
-//                  ),
-//                ),
-//                Text(cartItem.product.product_title),
-//              ],
-//            ),
-//          ),
-//          Row(
-//            children: <Widget>[
-//              IconButton(
-//                  icon: Icon(Icons.remove),
-//                  onPressed: () async {
-//                    setState(() {
-//                      isLoading = true;
-//                    });
-////                    await cartApi
-////                        .removeProductFromCart(cartItem.product.product_id);
-//                    setState(() {
-//                      isLoading = false;
-//                    });
-//                  }),
-//              Text(cartItem.qty.toString()),
-//              IconButton(
-//                  icon: Icon(Icons.add),
-//                  onPressed: () async {
-//                    setState(() {
-//                      isLoading = true;
-//                    });
-//                    await cartApi.addProductToCart(cartItem.product.product_id);
-//                    setState(() {
-//                      isLoading = false;
-//                    });
-//                  }),
-//            ],
-//          ),
-//        ],
-//      ),
-//    );
-//  }
+  Widget _drawProductRow(CartItem cartItem) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(cartItem.product.featuredImage()),
+                    ),
+                  ),
+                ),
+                Text(cartItem.product.product_title),
+              ],
+            ),
+          ),
+          Row(
+            children: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.remove),
+                  onPressed: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    await cartApi
+                        .removeProductFromCart(cartItem.product.product_id);
+                    setState(() {
+                      isLoading = false;
+                    });
+                  }),
+              Text(cartItem.qty.toString()),
+              IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    await cartApi.addProductToCart(cartItem.product.product_id);
+                    setState(() {
+                      isLoading = false;
+                    });
+                  }),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
